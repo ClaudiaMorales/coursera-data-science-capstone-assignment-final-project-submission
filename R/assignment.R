@@ -217,7 +217,7 @@ preprocess_corpus <- function(corpus) {
     corpus_preprocessed <- tm_map(corpus_preprocessed, stripWhitespace)
 
     # Stem the text.
-    corpus_preprocessed <- tm_map(corpus_preprocessed, stemDocument)
+    # corpus_preprocessed <- tm_map(corpus_preprocessed, stemDocument)
 
     # Remove stopwords.
     corpus_preprocessed <-
@@ -290,13 +290,64 @@ create_ngram <- function(n) {
 katz_backoff <- function(phrase) {
 
     tryCatch(
-        stopifnot(
-            if (typeof(phrase) == "character") {
+        if (typeof(phrase) == "character") {
 
-                return("word")
+            corpus_input <-
+                VCorpus(
+                    VectorSource(phrase),
+                    list(reader = PlainTextDocument)
+                )
+            corpus_input <- preprocess_corpus(corpus_input)
 
+            find_roots <- function(phrase) {
+                which(
+                    sapply(
+                        tdm_trigram$dimnames$Terms,
+                        function(terms) {
+                            grepl(
+                                phrase,
+                                paste(
+                                    strsplit(terms, split = " ")[[1]][1],
+                                    strsplit(terms, split = " ")[[1]][2]
+                                ),
+                                ignore.case = TRUE
+                            )
+                        }
+                    )
+                )
             }
-        ),
+
+            return(
+                tail(
+                    strsplit(
+                        names(
+                            find_roots(
+                                paste(
+                                    tail(
+                                        strsplit(
+                                            corpus_input[[1]][[1]][1],
+                                            split = " "
+                                        )[[1]],
+                                        n = 2
+                                    )[1],
+                                    tail(
+                                        strsplit(
+                                            corpus_input[[1]][[1]][1],
+                                            split = " "
+                                        )[[1]],
+                                        n = 2
+                                    )[2]
+                                )
+                            )
+                        ),
+                        split = " "
+                    )[[1]],
+                    n = 1
+                )
+            )
+
+        }
+        else stop(),
         error = function(e) {
             "Error in katz_backoff(): non-character or null input"
         }

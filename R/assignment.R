@@ -286,14 +286,6 @@ create_ngram <- function(n) {
 #' @details
 #' This function creates a Katz's back-off model.
 #' @export
-#' @importFrom
-
-# katz_backoff <- function(phrase) {
-#
-#     if (typeof(phrase) != "character") return("error")
-#     else return("word")
-#
-# }
 
 katz_backoff <- function(phrase) {
 

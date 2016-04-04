@@ -3,6 +3,7 @@
 export(create_ngram)
 export(create_tdm)
 export(download_data_file)
+export(katz_backoff)
 export(preprocess_corpus)
 export(read_data)
 export(sample_data_file)

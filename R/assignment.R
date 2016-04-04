@@ -276,6 +276,43 @@ create_ngram <- function(n) {
 }
 
 
+#' Katz's Back-Off
+#'
+#' Creates a Katz's back-off model.
+#'
+#' @param phrase a character-type input to the model
+#' @return a character-type word predicted by the model
+#' @author Michael David Gill
+#' @details
+#' This function creates a Katz's back-off model.
+#' @export
+#' @importFrom
+
+# katz_backoff <- function(phrase) {
+#
+#     if (typeof(phrase) != "character") return("error")
+#     else return("word")
+#
+# }
+
+katz_backoff <- function(phrase) {
+
+    tryCatch(
+        stopifnot(
+            if (typeof(phrase) == "character") {
+
+                return("word")
+
+            }
+        ),
+        error = function(e) {
+            "Error in katz_backoff(): non-character or null input"
+        }
+    )
+
+}
+
+
 # Main function calls.
 
 download_data_file(

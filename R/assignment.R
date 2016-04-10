@@ -287,63 +287,149 @@ create_ngram <- function(n) {
 #' This function creates a Katz's back-off model.
 #' @export
 
-katz_backoff <- function(phrase) {
+katz_backoff_model <- function(phrase) {
 
     tryCatch(
         if (typeof(phrase) == "character") {
 
+            trigram_model <- function(tokens) {
+
+                key <- function(tokens) {
+                    paste(
+                        tail(
+                            tokens,
+                            n = 2
+                        )[1],
+                        tail(
+                            tokens,
+                            n = 2
+                        )[2]
+                    )
+                }
+
+                # find matches and their count
+                matches_count <- function(phrase) {
+                    sapply(
+                        names(
+                            which(
+                                sapply(
+                                    Terms(tdm_trigram),
+                                    function(terms) {
+                                        grepl(
+                                            phrase,
+                                            paste(
+                                                strsplit(
+                                                    terms, split = " "
+                                                )[[1]][1],
+                                                strsplit(
+                                                    terms, split = " "
+                                                )[[1]][2]
+                                            ),
+                                            ignore.case = TRUE
+                                        )
+                                    }
+                                )
+                            )
+                        ),
+                        function(match) sum(tm_term_score(tdm_trigram, match))
+                    )
+                }
+
+                # find the last word of the most frequent match
+                tail_of_most_frequent_match <- function(phrase) {
+                    matches <- matches_count(phrase)
+                    tail(
+                        strsplit(
+                            names(
+                                head(
+                                    which(matches == max(matches)),
+                                    n = 1
+                                )
+                            )
+                            , split = " ")[[1]],
+                        n = 1
+                    )
+                }
+
+                return(
+                    tail_of_most_frequent_match(key(tokens))
+                )
+
+            }
+
+            bigram_model <- function(token) {
+
+                # find matches and their count
+                matches_count <- function(phrase) {
+                    sapply(
+                        names(
+                            which(
+                                sapply(
+                                    Terms(tdm_bigram),
+                                    function(terms) {
+                                        grepl(
+                                            phrase,
+                                            strsplit(
+                                                terms, split = " "
+                                            )[[1]][1],
+                                            ignore.case = TRUE
+                                        )
+                                    }
+                                )
+                            )
+                        ),
+                        function(match) sum(tm_term_score(tdm_bigram, match))
+                    )
+                }
+
+                # find the last word of the most frequent match
+                tail_of_most_frequent_match <- function(phrase) {
+                    matches <- matches_count(phrase)
+                    tail(
+                        strsplit(
+                            names(
+                                head(
+                                    which(matches == max(matches)),
+                                    n = 1
+                                )
+                            )
+                            , split = " ")[[1]],
+                        n = 1
+                    )
+                }
+
+                return(
+                    tail_of_most_frequent_match(token)
+                )
+
+            }
+
+            unigram_model <- function(token) {
+
+                associations <-
+                    findAssocs(tdm_unigram, token, corlimit = .99)[[1]]
+
+                return(
+                    names(sample(which(associations == max(associations)), 1))
+                )
+
+            }
+
+            # preprocess phrase
             corpus_input <-
                 VCorpus(
                     VectorSource(phrase),
                     list(reader = PlainTextDocument)
                 )
             corpus_input <- preprocess_corpus(corpus_input)
-
-            find_roots <- function(phrase) {
-                which(
-                    sapply(
-                        tdm_trigram$dimnames$Terms,
-                        function(terms) {
-                            grepl(
-                                phrase,
-                                paste(
-                                    strsplit(terms, split = " ")[[1]][1],
-                                    strsplit(terms, split = " ")[[1]][2]
-                                ),
-                                ignore.case = TRUE
-                            )
-                        }
-                    )
-                )
-            }
+            corpus_input_tokenized <- scan_tokenizer(corpus_input[[1]][[1]][1])
 
             return(
-                tail(
-                    strsplit(
-                        names(
-                            find_roots(
-                                paste(
-                                    tail(
-                                        strsplit(
-                                            corpus_input[[1]][[1]][1],
-                                            split = " "
-                                        )[[1]],
-                                        n = 2
-                                    )[1],
-                                    tail(
-                                        strsplit(
-                                            corpus_input[[1]][[1]][1],
-                                            split = " "
-                                        )[[1]],
-                                        n = 2
-                                    )[2]
-                                )
-                            )
-                        ),
-                        split = " "
-                    )[[1]],
-                    n = 1
-                )
+                if (length(corpus_input_tokenized) >= 2) {
+                    trigram_model(corpus_input_tokenized)
+                }
+                else bigram_model(corpus_input_tokenized)
+                # if either return null, run unigram_model
             )
 
         }

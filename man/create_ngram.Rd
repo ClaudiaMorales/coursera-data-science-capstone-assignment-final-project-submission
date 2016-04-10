@@ -4,9 +4,11 @@
 \alias{create_ngram}
 \title{Create n-Gram}
 \usage{
-create_ngram(n)
+create_ngram(corpus, n)
 }
 \arguments{
+\item{corpus}{corpus to be tokenized}
+
 \item{n}{size of n-gram}
 }
 \value{

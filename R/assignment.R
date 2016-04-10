@@ -229,28 +229,11 @@ preprocess_corpus <- function(corpus) {
 }
 
 
-#' Create TDM
-#'
-#' Creates a term-document matrix (TDM).
-#'
-#' @return a term-document matrix
-#' @author Michael David Gill
-#' @details
-#' This function creates a default term-document matrix.
-#' @export
-#' @importFrom tm TermDocumentMatrix
-
-create_tdm <- function() {
-
-    TermDocumentMatrix(corpus_cleaned)
-
-}
-
-
 #' Create n-Gram
 #'
 #' Creates a n-gram-tokenized term-document matrix (TDM).
 #'
+#' @param corpus corpus to be tokenized
 #' @param n size of n-gram
 #' @return a n-gram-tokenized term-document matrix
 #' @author Michael David Gill
@@ -259,17 +242,17 @@ create_tdm <- function() {
 #' @export
 #' @importFrom ngramrr tdm2
 
-create_ngram <- function(n) {
+create_ngram <- function(corpus, n) {
 
     if (n == 1) {
 
-        create_tdm()
+        TermDocumentMatrix(corpus)
 
     }
 
     else {
 
-        tdm2(corpus_cleaned, ngmin = n, ngmax = n)
+        tdm2(corpus, ngmin = n, ngmax = n)
 
     }
 
@@ -457,9 +440,9 @@ corpus <- read_data("en")
 
 corpus_cleaned <- preprocess_corpus(corpus)
 
-tdm_unigram <- create_ngram(1)
-tdm_bigram <- create_ngram(2)
-tdm_trigram <- create_ngram(3)
+tdm_unigram <- create_ngram(corpus_cleaned, 1)
+tdm_bigram <- create_ngram(corpus_cleaned, 2)
+tdm_trigram <- create_ngram(corpus_cleaned, 3)
 
 # frequent_terms_bigram <-
 #     findFreqTerms(tdm_bigram, lowfreq = 3, highfreq = 48)

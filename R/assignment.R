@@ -448,3 +448,6 @@ tdm_trigram <- create_ngram(corpus_cleaned, 3)
 
 # frequent_terms_trigram <-
 #     findFreqTerms(tdm_trigram, lowfreq = 4, highfreq = 10)
+
+save(tdm_unigram, tdm_bigram, tdm_trigram, file = "./R/ngrams.RData")
+load("./R/ngrams.RData")

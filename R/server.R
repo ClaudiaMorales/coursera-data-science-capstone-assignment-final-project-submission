@@ -189,7 +189,21 @@ load("ngrams.RData")
 shinyServer(
     function(input, output) {
 
-        output$word <- renderPrint({katz_backoff_model(input$phrase)})
+        output$phrase <-
+            renderText(
+                {
+                    if (input$predictButton == 0) "waiting for input ..."
+                    else input$phrase
+                }
+            )
+
+        output$word <-
+            renderText(
+                {
+                    if (input$predictButton == 0) "waiting for input ..."
+                    else katz_backoff_model(input$phrase)
+                }
+            )
 
     }
 )

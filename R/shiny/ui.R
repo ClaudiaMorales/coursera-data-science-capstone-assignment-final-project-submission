@@ -10,8 +10,8 @@ shinyUI(
                       As a user types, an auto-completion function presents that
                       user with possible completions to the current word being
                       typed or probable words that could follow the current word
-                      after it is typed.  This project intends to provide the
-                      latter function - word-prediction."),
+                      or phrase after it is typed. The package
+                      \"wordprediction\" provides the latter function."),
             fixedRow(
                 sidebarPanel(
                     span(

@@ -1,0 +1,267 @@
+---
+title: "Assignment: Milestone Report"
+author: "Michael David Gill"
+date: "March 20, 2016"
+output: html_document
+---
+
+### Summary
+
+This report concerns an exploratory analysis of word corpora intended for use in a predictive model to predict the next word to be typed for and auto-completion function for mobile devices.  The source code can be found at [https://github.com/michaelgill1969/coursera-data-science-capstone-assignment-milestone-report](https://github.com/michaelgill1969/coursera-data-science-capstone-assignment-milestone-report)
+
+### Exploratory Analysis
+
+```{r libraries, cache = TRUE, echo = FALSE, include = FALSE}
+
+# Load the necessary libraries.
+
+library("tm")
+library("NLP")
+library("openNLP")
+# library("sqldf")
+
+```
+
+Auto-completion is a common function on mobile devices.  As a user types, an auto-completion function presents that user with possible completions to the current word being typed or probable words that could follow the current word after it is typed.  This project intends to provide the latter function - word-prediction.
+
+#### Data File
+
+```{r file, cache = TRUE, echo = FALSE, include = FALSE}
+
+# Download and uncompress the data file.
+
+if (!file.exists("Coursera-SwiftKey.zip")) {
+    
+    download.file(
+        "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip",
+        destfile = "Coursera-SwiftKey.zip",
+        method = "curl"
+    )
+    
+    unzip("Coursera-SwiftKey.zip")
+    
+    # Sample the data files via Mac OS X shell.
+    system(
+        "
+        cd ./final/de_DE;
+        gshuf -n 1000 de_DE.blogs.txt > de_DE.blogs.sample.txt;
+        gshuf -n 1000 de_DE.news.txt > de_DE.news.sample.txt;
+        gshuf -n 1000 de_DE.twitter.txt > de_DE.twitter.sample.txt;
+        rm de_DE.blogs.txt;
+        rm de_DE.news.txt;
+        rm de_DE.twitter.txt
+        cd ..; cd ..;
+        cd ./final/en_US;
+        gshuf -n 1000 en_US.blogs.txt > en_US.blogs.sample.txt;
+        gshuf -n 1000 en_US.news.txt > en_US.news.sample.txt;
+        gshuf -n 1000 en_US.twitter.txt > en_US.twitter.sample.txt;
+        rm en_US.blogs.txt;
+        rm en_US.news.txt;
+        rm en_US.twitter.txt
+        cd ..; cd ..;
+        cd ./final/fi_FI;
+        gshuf -n 1000 fi_FI.blogs.txt > fi_FI.blogs.sample.txt;
+        gshuf -n 1000 fi_FI.news.txt > fi_FI.news.sample.txt;
+        gshuf -n 1000 fi_FI.twitter.txt > fi_FI.twitter.sample.txt;
+        rm fi_FI.blogs.txt;
+        rm fi_FI.news.txt;
+        rm fi_FI.twitter.txt
+        cd ..; cd ..;
+        cd ./final/ru_RU;
+        gshuf -n 1000 ru_RU.blogs.txt > ru_RU.blogs.sample.txt;
+        gshuf -n 1000 ru_RU.news.txt > ru_RU.news.sample.txt;
+        gshuf -n 1000 ru_RU.twitter.txt > ru_RU.twitter.sample.txt;
+        rm ru_RU.blogs.txt;
+        rm ru_RU.news.txt;
+        rm ru_RU.twitter.txt
+        cd ..; cd ..;
+        "
+    )
+}
+
+```
+
+In order to build a function that can provide word-prediction, a predictive model is needed.  Such models use known content to predict unknown content.  For this function, that content comes from the HC Corpora collection, which is "a collection of corpora for various languages freely available to download" (Christensen, n.d.). The version to be used was obtained from an archive maintained at Coursera (Leek, Peng, Caffo, & Johns Hopkins University (n.d.).  The file included three text document collections, blogs, news feeds, and tweets, in four languages, German, English, Finnish, and Russian.  For this report, only the English collections were used.  The files were to large to be manipulated using a home computer (e.g., the downloaded ZIP file was 575 MB).  Therefore, 1000 lines were randomly sampled from each collection using a Mac OS X (Version x86_64-apple-darwin13.4.0) terminal application before loading for analysis in RStudio (Version 0.99.892) running the R statistical programming language (Version 3.2.3).
+
+#### Data Structure
+
+```{r structure, cache = TRUE, echo = FALSE, include = FALSE}
+
+# Read the data files into corpora.
+
+# if (!exists("corpus.de")) {
+#     corpus.de <-
+#         VCorpus(
+#             DirSource("./final/de_DE"),
+#             readerControl = list(reader = readPlain, language  = "de")
+#         )
+# }
+
+if (!exists("corpus.en")) {
+    corpus.en <-
+        VCorpus(
+            DirSource("./final/en_US"),
+            readerControl = list(reader = readPlain)
+        )
+}
+
+# if (!exists("corpus.fi")) {
+#     corpus.fi <-
+#         VCorpus(
+#             DirSource("./final/fi_FI"),
+#             readerControl = list(reader = readPlain, language  = "fi")
+#         )
+# }
+
+# if (!exists("corpus.ru")) {
+#     corpus.ru <-
+#         VCorpus(
+#             DirSource("./final/ru_RU"),
+#             readerControl = list(reader = readPlain, language  = "ru")
+#         )
+# }
+
+```
+
+This project uses the data stuctures described in Feinerer, Hornik, and Meyer (2008) from the Text Mining Package (Version 0.6-2; Feinerer, Hornik, & Artifex Software, Inc., 2015), tm.  In these structures, text document collections are organized into corpora, the basic objects to be manipulated by the word-prediction function.  Accordingly, the HC Corpora data file were loaded as tm corpora.
+
+#### Data Cleaning
+
+```{r cleaning, cache = TRUE, echo = FALSE, include = FALSE}
+
+# Preprocess the corpora.
+
+# Remove punctuation from text.
+corpus.en.cleaned <- tm_map(corpus.en, removePunctuation)
+# Remove numbers from text.
+corpus.en.cleaned <- tm_map(corpus.en.cleaned, removeNumbers)
+# Convert text to lowercase.
+corpus.en.cleaned <- tm_map(corpus.en.cleaned, content_transformer(tolower))
+# Strip whitespace from text.
+corpus.en.cleaned <- tm_map(corpus.en.cleaned, stripWhitespace)
+# Stem the text.
+corpus.en.cleaned <- tm_map(corpus.en.cleaned, stemDocument)
+# Remove stopwords.
+corpus.en.cleaned <-
+    tm_map(corpus.en.cleaned, removeWords, stopwords("english"))
+
+# # Tag the data by part-of-speech.
+# tagPOS <-  function(x, ...) {
+#     s <- as.String(x)
+#     word_token_annotator <- Maxent_Word_Token_Annotator()
+#     a2 <- Annotation(1L, "sentence", 1L, nchar(s))
+#     a2 <- annotate(s, word_token_annotator, a2)
+#     a3 <- annotate(s, Maxent_POS_Tag_Annotator(), a2)
+#     a3w <- a3[a3$type == "word"]
+#     POStags <- unlist(lapply(a3w$features, `[[`, "POS"))
+#     POStagged <- paste(sprintf("%s/%s", s[a3w], POStags), collapse = " ")
+#     list(POStagged = POStagged, POStags = POStags)
+# } # (Swamynathan, 2015)
+# en.blogs.POS <- tagPOS(corpus.en.cleaned[[1]])
+# en.news.POS <- tagPOS(corpus.en.cleaned[[1]])
+# en.twitter.POS <- tagPOS(corpus.en.cleaned[[1]])
+
+```
+
+Data cleaning involves transforming the raw text in the corpus into a format more suitable for automated manipulation.  The tm package provides numerous functions for such transformations (see Feinerer et al., 2008, p. 9).  For this exploratory analysis, the texts were converted to lower case, stripped of whitespace, and stemmed (i.e., word suffixes were erased to retrieve their radicals; see Feinerer et al., 2008, p. 24).  Also, common English stopwords (i.e., words so common that they contain little information; see Feinerer et al., 2008, pp. 25-26) were removed.  Part-of-speech tagging was also investigated, but it was not used.
+
+#### Data Features
+
+```{r features, cache = TRUE, echo = FALSE, include = FALSE}
+
+# Create a Term-Document Matrix (TDM).
+
+tdm.en <- TermDocumentMatrix(corpus.en.cleaned)
+
+
+# Explore the TDM.
+
+# Find the number of words in each text collection.
+
+term.frequency.en.blogs <- termFreq(corpus.en.cleaned[[1]])
+term.frequency.en.news <- termFreq(corpus.en.cleaned[[2]])
+term.frequency.en.twitter <- termFreq(corpus.en.cleaned[[3]])
+
+# Create a table
+length.sum.en.matrix <-
+    matrix(
+       c(
+            length(term.frequency.en.blogs),
+            length(term.frequency.en.news),
+            length(term.frequency.en.twitter),
+            sum(term.frequency.en.blogs),
+            sum(term.frequency.en.news),
+            sum(term.frequency.en.twitter)
+        ),
+        ncol = 3,
+        byrow = TRUE
+    )
+colnames(length.sum.en.matrix) <- c("Blogs","News Feeds","Tweets")
+rownames(length.sum.en.matrix) <- c("Unique Words","Sum of Words")
+length.sum.en.table <- as.table(length.sum.en.matrix)
+
+term.frequency.range <- range(tdm.en$v)
+
+frequent.terms.en <- findFreqTerms(tdm.en, lowfreq = 30, highfreq = 30)
+
+```
+
+From the cleaned English corpus, a term-document matrix (TDM) was created.  A TDM is a matrix of words and their frequencies in each line of the text collections of a corpus.  For this corpus, the range of frequencies for words appearing int the corpus was `r term.frequency.range[1]` to `r term.frequency.range[2]`.  The most important words were defined as those words not appearing too infrequently or too frequently.  Reasoning like Feinerer et al. (2008):
+
+```
+we take values around 30, since smaller values for this corpus tend to be already negligible due to the large number of documents. On the other side bigger values tend to be too common in most of the newsgroup postings.  (p. 39)
+```
+
+These important words are as follows:
+
+```{r features.frequent.terms, cache = TRUE, echo = FALSE}
+
+frequent.terms.en
+
+```
+
+A table was then created that shows the number of unique words and the summed frequency of those words for each of the three text collections, as follows:
+
+```{r features.table, cache = TRUE, echo = FALSE}
+
+length.sum.en.table
+
+```
+
+Finally, in order to check whether the size of the samples of the collections, which was 1000 each, was sufficient, the term-document matrix was checked to see if they obeyed two laws from linguistics concerning large corpora.  First, "Zipf's law ... states that given some corpus of natural language utterances, the frequency of any word is inversely proportional to its rank in the frequency table" (Explore Corpus Term Frequency Characteristics, n.d.).
+
+```{r features.zipf.plot, cache = TRUE, echo = FALSE}
+
+zipf.plot <- Zipf_plot(tdm.en, main = "Zipf's Law")
+
+```
+
+*Figure 1. Zipf's law holds for this matrix, especially for higher ranks, as shown by the adherence of the curve obtained from the data to the theoretical diagonal line.*
+
+Second, "Heaps' law ... states that the vocabulary size V (i.e., the number of different terms employed) grows polynomially with the text size T (the total number of terms in the texts)" (Explore Corpus Term Frequency Characteristics, n.d.).
+
+```{r features.heaps.plot, cache = TRUE, echo = FALSE}
+
+heaps.plot <- Heaps_plot(tdm.en, main = "Heap's Law")
+
+```
+
+*Figure 2. Heap's law holds extremely for this matrix, as shown by the near complete adherence of the line obtained from the data to the theoretical diagonal line.*
+
+### Conclusion
+
+This analysis has shown features of samples of 1000 words each from a corpus of collections English words.  The corpus has a large range of words and word frequencies with a number of important words.  The sample size was large enough to satisfy two laws from linguistics concerning large corpora.  If future analyses show the sample size to be too small, it can easilly be increased.  As is, this analysis ran rather quickly on a home computer.
+
+### References
+
+Christensen, H. (n.d.). *HC Corpora*. Retrieved from [http://www.corpora.heliohost.org](http://www.corpora.heliohost.org)
+
+Explore Corpus Term Frequency Characteristics [Computer software]. (n.d.). Retrieved from http://www.inside-r.org/packages/cran/tm/docs/Zipf_n_Heaps
+
+Feinerer, I., Hornik, K., & Artifex Software, Inc. (2015, July 2). Text Mining Package [Computer software]. Retrieved from [http://tm.r-forge.r-project.org](http://tm.r-forge.r-project.org)
+
+Feinerer, I., Hornik, K., & Meyer, D. (2008). *Text mining infrastructure in R. Journal of Statistical Software, 25*(5), 1–54. [http://doi.org/citeulike-article-id:2842334](http://doi.org/citeulike-article-id:2842334)
+
+Leek, J., Peng, R., Caffo, B., & Johns Hopkins University (n.d.). *Data Science Capstone*, Coursera. Retrieved from [https://www.coursera.org/learn/data-science-project/](https://www.coursera.org/learn/data-science-project/)
+
+Swamynathan, M. (2015, February 27). *r - could not find function tagPOS - Stack Overflow*. Retrieved from [http://stackoverflow.com/a/28764608/6084947](http://stackoverflow.com/a/28764608/6084947)

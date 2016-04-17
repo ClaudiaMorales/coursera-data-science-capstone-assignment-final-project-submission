@@ -5,9 +5,18 @@ output: html_document
 ```{r setup, include = TRUE, eval = FALSE}
 
 ################################################################################
-# This package, in partial fulfillment of the requirements of the Coursera     #
-# course, "Data Science Capstone", contains a predictive model to predict the  #
-# next word to be typed for an auto-completion function for mobile devices.    #
+# Package: wordprediction                                                      #
+# Type: Package                                                                #
+# Title: Word Prediction                                                       #
+# Author: Michael David Gill                                                   #
+# Maintainer: Michael David Gill <michaelgill1969@gmail.com>                   #
+# URL: https://github.com/michaelgill1969/coursera-data-science-capstone-      #
+# assignment-final-project-submission                                          #
+# Description: This package, in partial fulfillment of the requirements of the #
+# Coursera course, "Data Science Capstone", contains functions for an          #
+# auto-completion model that predicts the next word to be typed based on a     #
+# word or phrase previously typed.                                             #
+# License: Apache License 2.0                                                  #
 ################################################################################
 
 
@@ -23,7 +32,7 @@ library("ngramrr")
 #' @author Michael David Gill
 #' @details
 #' This function downloads a data file from a specified location URL for use in
-#' the package "assignment".
+#' the package "wordprediction".
 #' @export
 #' @importFrom utils download.file
 
@@ -50,7 +59,8 @@ download_data_file <- function(location, data_file) {
 #' @param data_file name of the data file to be used formatted as a character.
 #' @author Michael David Gill
 #' @details
-#' This function uncompresses a data file for use in the package "assignment".
+#' This function uncompresses a data file for use in the package
+#' "wordprediction".
 #' @export
 #' @importFrom utils unzip
 
@@ -198,14 +208,13 @@ read_data <- function(language) {
 #' @author Michael David Gill
 #' @details
 #' This function preprocesses a corpus by removing punctuation, numbers, and
-#' English stopwords, stripping whitespace, and stemming words.
+#' English stopwords, and stripping whitespace.
 #' @export
 #' @importFrom tm tm_map
 #' @importFrom tm removePunctuation
 #' @importFrom tm removeNumbers
 #' @importFrom tm content_transformer
 #' @importFrom tm stripWhitespace
-#' @importFrom tm stemDocument
 #' @importFrom tm removeWords
 #' @importFrom tm stopwords
 
@@ -274,7 +283,11 @@ create_ngram <- function(corpus, n) {
 #' @return a character-type word predicted by the model
 #' @author Michael David Gill
 #' @details
-#' This function creates a Katz's back-off model.
+#' This function creates a simplified Katz's back-off model that backs off to
+#' smaller n-grams when the key is not found in the larger n-gram.  The maximum
+#' n-gram handled is a trigram.  The word returned is the match found in the
+#' largest n-gram where the key is found.  When the key is not found in the
+#' unigram, the word "will" is returned.
 #' @export
 #' @importFrom tm Terms
 #' @importFrom tm tm_term_score
@@ -456,10 +469,11 @@ tdm_unigram <- create_ngram(corpus_cleaned, 1)
 tdm_bigram <- create_ngram(corpus_cleaned, 2)
 tdm_trigram <- create_ngram(corpus_cleaned, 3)
 
-if (!file.exists("./R/ngrams.RData")) {
+# save the n-grams
+if (!file.exists("./R/shiny/ngrams.RData")) {
 
-    save(tdm_unigram, tdm_bigram, tdm_trigram, file = "./R/ngrams.RData")
-    # load("./R/ngrams.RData")
+    save(tdm_unigram, tdm_bigram, tdm_trigram, file = "./R/shiny/ngrams.RData")
+    # load("./R/shiny/ngrams.RData")
 
 }
 

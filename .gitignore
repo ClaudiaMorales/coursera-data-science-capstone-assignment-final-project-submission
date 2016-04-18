@@ -18,7 +18,6 @@ vignettes/*.pdf
 .Ruserdata
 .Rprofile
 *.zip
-*.html
 final/
 rsconnect/
 packrat/

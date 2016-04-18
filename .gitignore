@@ -1,7 +1,3 @@
-.Ruserdata
-.Rbuildignore
-.Rprofile
-
 # History files
 .Rhistory
 .Rapp.history
@@ -19,6 +15,8 @@ vignettes/*.pdf
 # system files
 .DS_Store
 # miscellaneous
+.Ruserdata
+.Rprofile
 *.zip
 *.html
 final/

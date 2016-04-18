@@ -1,0 +1,9 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.Rprofile$
+^\.gitignore$
+^Coursera-SwiftKey.zip$
+^final/
+^packrat/
+^R/shiny/
+^R/presentations/

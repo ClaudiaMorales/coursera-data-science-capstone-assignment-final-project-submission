@@ -1,5 +1,6 @@
 .Ruserdata
 .Rbuildignore
+.Rprofile
 
 # History files
 .Rhistory
@@ -25,8 +26,7 @@ vignettes/*.pdf
 .DS_Store
 
 # miscellaneous
-rsconnect/
-final/
 *.zip
-packrat/lib*/
-packrat/src/
+final/
+rsconnect/
+packrat/

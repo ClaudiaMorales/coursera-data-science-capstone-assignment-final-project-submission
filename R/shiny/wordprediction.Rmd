@@ -20,9 +20,6 @@ output: html_document
 ################################################################################
 
 
-library("tm")
-library("ngramrr")
-
 #' Download Data File
 #'
 #' Downloads a data file.
@@ -450,32 +447,36 @@ katz_backoff_model <- function(phrase) {
 }
 
 
-# Main function calls.
-
-download_data_file(
-    "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip",
-    "Coursera-SwiftKey.zip"
-)
-
-uncompress_data_file("final", "Coursera-SwiftKey.zip")
-
-sample_data_file()
-
-corpus <- read_data("en")
-
-corpus_cleaned <- preprocess_corpus(corpus)
-
-tdm_unigram <- create_ngram(corpus_cleaned, 1)
-tdm_bigram <- create_ngram(corpus_cleaned, 2)
-tdm_trigram <- create_ngram(corpus_cleaned, 3)
-
-# save the n-grams
-if (!file.exists("./R/shiny/ngrams.RData")) {
-
-    save(tdm_unigram, tdm_bigram, tdm_trigram, file = "./R/shiny/ngrams.RData")
-    # load("./R/shiny/ngrams.RData")
-
-}
+# # Main function calls.
+#
+# # load libraries
+# library("tm")
+# library("ngramrr")
+#
+# download_data_file(
+#     "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip",
+#     "Coursera-SwiftKey.zip"
+# )
+#
+# uncompress_data_file("final", "Coursera-SwiftKey.zip")
+#
+# sample_data_file()
+#
+# corpus <- read_data("en")
+#
+# corpus_cleaned <- preprocess_corpus(corpus)
+#
+# tdm_unigram <- create_ngram(corpus_cleaned, 1)
+# tdm_bigram <- create_ngram(corpus_cleaned, 2)
+# tdm_trigram <- create_ngram(corpus_cleaned, 3)
+#
+# # save the n-grams
+# if (!file.exists("./R/shiny/ngrams.RData")) {
+#
+#     save(tdm_unigram, tdm_bigram, tdm_trigram, file = "./R/shiny/ngrams.RData")
+#     # load("./R/shiny/ngrams.RData")
+#
+# }
 
 
 ```

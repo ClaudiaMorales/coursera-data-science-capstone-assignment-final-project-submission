@@ -127,9 +127,6 @@ $(document).ready(function () {
 ################################################################################
 
 
-library(&quot;tm&quot;)
-library(&quot;ngramrr&quot;)
-
 #' Download Data File
 #'
 #' Downloads a data file.
@@ -557,32 +554,36 @@ katz_backoff_model &lt;- function(phrase) {
 }
 
 
-# Main function calls.
-
-download_data_file(
-    &quot;https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip&quot;,
-    &quot;Coursera-SwiftKey.zip&quot;
-)
-
-uncompress_data_file(&quot;final&quot;, &quot;Coursera-SwiftKey.zip&quot;)
-
-sample_data_file()
-
-corpus &lt;- read_data(&quot;en&quot;)
-
-corpus_cleaned &lt;- preprocess_corpus(corpus)
-
-tdm_unigram &lt;- create_ngram(corpus_cleaned, 1)
-tdm_bigram &lt;- create_ngram(corpus_cleaned, 2)
-tdm_trigram &lt;- create_ngram(corpus_cleaned, 3)
-
-# save the n-grams
-if (!file.exists(&quot;./R/shiny/ngrams.RData&quot;)) {
-
-    save(tdm_unigram, tdm_bigram, tdm_trigram, file = &quot;./R/shiny/ngrams.RData&quot;)
-    # load(&quot;./R/shiny/ngrams.RData&quot;)
-
-}</code></pre>
+# # Main function calls.
+#
+# # load libraries
+# library(&quot;tm&quot;)
+# library(&quot;ngramrr&quot;)
+#
+# download_data_file(
+#     &quot;https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip&quot;,
+#     &quot;Coursera-SwiftKey.zip&quot;
+# )
+#
+# uncompress_data_file(&quot;final&quot;, &quot;Coursera-SwiftKey.zip&quot;)
+#
+# sample_data_file()
+#
+# corpus &lt;- read_data(&quot;en&quot;)
+#
+# corpus_cleaned &lt;- preprocess_corpus(corpus)
+#
+# tdm_unigram &lt;- create_ngram(corpus_cleaned, 1)
+# tdm_bigram &lt;- create_ngram(corpus_cleaned, 2)
+# tdm_trigram &lt;- create_ngram(corpus_cleaned, 3)
+#
+# # save the n-grams
+# if (!file.exists(&quot;./R/shiny/ngrams.RData&quot;)) {
+#
+#     save(tdm_unigram, tdm_bigram, tdm_trigram, file = &quot;./R/shiny/ngrams.RData&quot;)
+#     # load(&quot;./R/shiny/ngrams.RData&quot;)
+#
+# }</code></pre>
 
 
 

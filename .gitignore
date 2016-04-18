@@ -25,6 +25,8 @@ vignettes/*.pdf
 .DS_Store
 
 # miscellaneous
-rsconnect
+rsconnect/
 final/
 *.zip
+packrat/lib*/
+packrat/src/

@@ -544,7 +544,7 @@ katz_backoff_model &lt;- function(phrase) {
                 trigram_model(corpus_input)
             } else if (length(corpus_input) == 1) {
                 bigram_model(corpus_input)
-            } else return(&quot;will&quot;)
+            } else unigram_model(corpus_input)
         )
 
     } else {

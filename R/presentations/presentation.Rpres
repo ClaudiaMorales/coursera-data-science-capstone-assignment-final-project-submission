@@ -1,7 +1,7 @@
 Word Prediction
 ========================================================
 author: Michael David Gill
-date: April 25, 2016
+date: April 17, 2016
 autosize: true
 Submitted in partial fulfillment of the requirements of the Coursera course, "Data Science Capstone".
 
@@ -18,7 +18,7 @@ Auto-completion is a common function on mobile devices. As a user types, an auto
 
 In order to build a package that can provide word-prediction, a predictive model is needed.  Such models use known content to predict unknown content.  For this demonstration, that content came from the HC Corpora collection, which is "a collection of corpora for various languages freely available to download" (Christensen, n.d.). The version to be used was obtained from an archive maintained at Coursera (Leek, Peng, Caffo, & Johns Hopkins University, n.d.).
 
-Data Structures & Cleaning: The "tm" Package
+Data Structure & Cleaning: The "tm" Package
 ========================================================
 
 This package used the data stuctures created for the tm package described in Feinerer, Hornik, and Meyer (2008).  In these structures, text document collections are organized into corpora, the basic objects to be manipulated by the word-prediction function.  Accordingly, the HC Corpora data file were loaded as tm corpora.

@@ -17,7 +17,7 @@ shinyUI(
                     span(
                         textInput(
                             "phrase",
-                            "Text Input: ",
+                            "Text Input: (enter all but the last word of a phrase)",
                             value = ""
                         ),
                         actionButton("predictButton", "Predict")
@@ -32,9 +32,14 @@ shinyUI(
             ),
             tabsetPanel(
                 tabPanel(
-                    "Helper Package",
+                    "Report",
                     br(),
-                    includeHTML("helper.html")
+                    includeHTML("report.html")
+                ),
+                tabPanel(
+                    "wordprediction Package",
+                    br(),
+                    includeHTML("wordprediction.html")
                 ),
                 tabPanel(
                     "ui.R",

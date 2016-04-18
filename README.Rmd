@@ -1,6 +1,11 @@
-# wordprediction package for R
-Michael David Gill  
-April 17, 2016  
+---
+title: "wordprediction package for R"
+author: "Michael David Gill"
+date: "April 17, 2016"
+output: 
+  html_document: 
+    keep_md: yes
+---
 
 ### Summary
 
